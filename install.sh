@@ -18,6 +18,9 @@ echo "==> Building mdViewer..."
 cd "$SCRIPT_DIR"
 mvn -q package
 
+# Prompt once with a clear label; subsequent sudo calls reuse the cached token
+sudo -v -p "Root Password: "
+
 echo "==> Installing to $LIB_DIR..."
 sudo mkdir -p "$LIB_DIR"
 sudo cp target/mdviewer.jar "$LIB_DIR/mdviewer.jar"

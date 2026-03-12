@@ -34,9 +34,16 @@ else
     JAVA="java"
 fi
 
+# -Xdock is macOS-only
+if [ "$(uname)" = "Darwin" ]; then
+    DOCK_FLAG="-Xdock:name=mdViewer"
+else
+    DOCK_FLAG=""
+fi
+
 exec "$JAVA" \
     --enable-native-access=ALL-UNNAMED \
-    -Xdock:name="mdViewer" \
+    $DOCK_FLAG \
     -Xmx512m \
     -jar "$JAR" \
     "$@"
