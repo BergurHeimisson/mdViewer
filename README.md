@@ -7,6 +7,7 @@ A minimalistic Java Swing application for viewing Markdown files with a Dracula-
 - Drag-and-drop a `.md` or `.markdown` file onto the window to open it
 - Pass a file path as a command-line argument
 - Cycle through all `.md` files in the same folder with the arrow keys
+- Scroll content with up/down arrow keys
 - Open files via `Cmd+O`
 - Rendered Markdown with support for tables, task lists, strikethrough, autolinks, and heading anchors
 - Dracula colour theme throughout — FlatLaf for the chrome, inline CSS for the content
@@ -16,6 +17,7 @@ A minimalistic Java Swing application for viewing Markdown files with a Dracula-
 
 - Java 17+
 - Maven 3.6+ (to build)
+- macOS or Linux (Windows is not supported)
 
 ## Installation
 
@@ -27,7 +29,7 @@ cd mdViewer
 ./install.sh
 ```
 
-This builds the JAR, copies it to `/usr/local/lib/mdviewer/`, and symlinks the launcher into `/usr/local/bin/` so `mdviewer` is available in every terminal session without any shell configuration.
+Installs to `/usr/local/lib/mdviewer/` and symlinks the launcher into `/usr/local/bin/` — no PATH or shell configuration needed after that.
 
 **Uninstall:**
 
@@ -45,7 +47,7 @@ Or launch with no argument and drop a file onto the window.
 
 ## Development
 
-Build without installing:
+Build and run without installing:
 
 ```sh
 mvn package

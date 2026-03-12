@@ -34,7 +34,9 @@ Only the Dracula-specific colour overrides live in `FlatDraculaTheme.properties`
 `DropTarget` is registered directly on the `JEditorPane`, which covers the entire visible window area. A purple border highlight on `dragEnter` provides visual feedback without any additional overlay component.
 
 **Arrow key navigation bound on `JEditorPane` directly**
-Left/right arrow keys are bound on the `JEditorPane`'s own `WHEN_FOCUSED` input map, overriding its built-in cursor-movement bindings. Binding them on the root pane (`WHEN_IN_FOCUSED_WINDOW`) does not work because the editor pane consumes arrow events first. When a file is opened, `rebuildSiblings()` scans the parent directory for `.md`/`.markdown` files, sorts them alphabetically, and stores them for O(1) index lookup during navigation.
+All four arrow keys are bound on the `JEditorPane`'s own `WHEN_FOCUSED` input map, overriding its built-in cursor-movement bindings. Binding them on the root pane (`WHEN_IN_FOCUSED_WINDOW`) does not work because the editor pane consumes arrow events first.
+- Left/right: call `navigateSibling(±1)`, which cycles through `.md` files in the same directory sorted alphabetically.
+- Up/down: adjust `scrollPane.getVerticalScrollBar()` by one unit increment.
 
 **Absolute path normalisation on open**
 All `File` arguments are resolved to absolute paths via `getAbsoluteFile()` before use. `getParentFile()` returns `null` for bare filenames (e.g. `ARCHITECTURE.md` with no directory component), which would cause a `NullPointerException` in `rebuildSiblings`.
@@ -55,10 +57,18 @@ Cross-platform persistent storage for window bounds. No config file to manage or
 | `commonmark-ext-autolink` | Auto-linkify bare URLs |
 | `commonmark-ext-heading-anchor` | Anchor IDs on headings |
 
-## Launcher script
+## Launcher script (`mdviewer`)
 
-`mdviewer` (shell script at project root) uses the Homebrew JDK directly and passes `--enable-native-access=ALL-UNNAMED` to suppress the FlatLaf restricted-method warning on Java 25. An alias in `~/.zshrc` makes it available system-wide:
+The shell script works both in development (run from the project root, finds `target/mdviewer.jar`) and when installed (symlinked from `/usr/local/bin/`, finds `mdviewer.jar` next to the resolved script path).
 
-```sh
-alias mdviewer='/Users/bergurheimisson/ai_code/mdViewer/mdviewer'
-```
+**Symlink resolution:** `$0` inside a symlink points to the symlink, not the real file. The script walks `readlink` in a loop until it reaches the real path, so `DIR` always resolves to the actual script directory regardless of how it was invoked.
+
+**Java discovery order:** `$JAVA_HOME` → Homebrew on Apple Silicon (`/opt/homebrew/opt/openjdk`) → Homebrew on Intel (`/usr/local/opt/openjdk`) → macOS `java_home` utility → `java` in `PATH`.
+
+**Platform flag:** `-Xdock:name=mdViewer` is macOS-only. The script checks `uname` and omits it on Linux.
+
+**`--enable-native-access=ALL-UNNAMED`:** Suppresses the FlatLaf restricted-method warning introduced in Java 17.
+
+## Installation (`install.sh`)
+
+Builds the JAR with Maven, prompts once for the root password (`sudo -v -p "Root Password: "`), copies the JAR and launcher to `/usr/local/lib/mdviewer/`, and symlinks the launcher into `/usr/local/bin/`. Works on macOS and Linux. Windows is not supported.
