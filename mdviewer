@@ -1,23 +1,40 @@
 #!/bin/sh
 # mdviewer — launch the mdViewer Swing application
 #
-# Usage:
-#   mdviewer [path/to/file.md]
-#
-# Place this script (and the project alongside it, or set MDVIEWER_JAR)
-# somewhere on your PATH, e.g. /usr/local/bin/.
+# Works both when run directly from the project root (development)
+# and when installed via install.sh (symlinked from /usr/local/bin).
 
-DIR="$(cd "$(dirname "$0")" && pwd)"
-JAR="${MDVIEWER_JAR:-${DIR}/target/mdviewer.jar}"
+# Resolve symlinks so DIR always points to the real script location
+SCRIPT="$0"
+while [ -L "$SCRIPT" ]; do
+    SCRIPT="$(readlink "$SCRIPT")"
+done
+DIR="$(cd "$(dirname "$SCRIPT")" && pwd)"
 
-if [ ! -f "$JAR" ]; then
-    echo "mdviewer: JAR not found at $JAR" >&2
-    echo "Build first with:  cd \"$DIR\" && mvn package" >&2
+# Installed JAR sits next to the script; dev JAR is in target/
+if [ -f "$DIR/mdviewer.jar" ]; then
+    JAR="$DIR/mdviewer.jar"
+elif [ -f "$DIR/target/mdviewer.jar" ]; then
+    JAR="$DIR/target/mdviewer.jar"
+else
+    echo "mdviewer: JAR not found. Run install.sh or build with: mvn package" >&2
     exit 1
 fi
 
-JAVA_HOME=/opt/homebrew/Cellar/openjdk/25.0.2/libexec/openjdk.jdk/Contents/Home
-exec "$JAVA_HOME/bin/java" \
+# Find Java 17+: JAVA_HOME env > Homebrew (Apple Silicon) > Homebrew (Intel) > macOS java_home > PATH
+if [ -n "$JAVA_HOME" ] && [ -x "$JAVA_HOME/bin/java" ]; then
+    JAVA="$JAVA_HOME/bin/java"
+elif [ -x "/opt/homebrew/opt/openjdk/bin/java" ]; then
+    JAVA="/opt/homebrew/opt/openjdk/bin/java"
+elif [ -x "/usr/local/opt/openjdk/bin/java" ]; then
+    JAVA="/usr/local/opt/openjdk/bin/java"
+elif /usr/libexec/java_home > /dev/null 2>&1; then
+    JAVA="$(/usr/libexec/java_home)/bin/java"
+else
+    JAVA="java"
+fi
+
+exec "$JAVA" \
     --enable-native-access=ALL-UNNAMED \
     -Xdock:name="mdViewer" \
     -Xmx512m \

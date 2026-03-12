@@ -14,39 +14,42 @@ A minimalistic Java Swing application for viewing Markdown files with a Dracula-
 
 ## Requirements
 
-- Java 11+
+- Java 17+
 - Maven 3.6+ (to build)
 
-## Build
+## Installation
+
+Clone the repo and run the install script:
 
 ```sh
-mvn package
+git clone https://github.com/BergurHeimisson/mdViewer.git
+cd mdViewer
+./install.sh
 ```
 
-Produces `target/mdviewer.jar` (fat JAR, all dependencies bundled).
+This builds the JAR, copies it to `/usr/local/lib/mdviewer/`, and symlinks the launcher into `/usr/local/bin/` so `mdviewer` is available in every terminal session without any shell configuration.
 
-## Run
+**Uninstall:**
+
+```sh
+sudo rm -rf /usr/local/lib/mdviewer /usr/local/bin/mdviewer
+```
+
+## Usage
 
 ```sh
 mdviewer path/to/file.md
 ```
 
-Or drop a file onto the window after launching with no argument.
+Or launch with no argument and drop a file onto the window.
 
-Requires the alias in `~/.zshrc` (see Installation) or run `./mdviewer` directly from the project root.
+## Development
 
-## Installation
-
-Add to `~/.zshrc` so the command is available everywhere:
+Build without installing:
 
 ```sh
-alias mdviewer='/Users/bergurheimisson/ai_code/mdViewer/mdviewer'
-```
-
-Then reload your shell:
-
-```sh
-source ~/.zshrc
+mvn package
+./mdviewer path/to/file.md
 ```
 
 ## Key bindings
