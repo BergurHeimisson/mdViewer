@@ -36,6 +36,19 @@ public class MainWindow extends JFrame {
 
     private static final String APP_TITLE = "mdViewer";
 
+    // Font options shown in the dropdown (display name → CSS font-family stack)
+    private static final String[] FONT_NAMES = {
+        "System Default", "Helvetica Neue", "Georgia", "Arial", "Verdana", "Courier New"
+    };
+    private static final String[] FONT_STACKS = {
+        MarkdownRenderer.DEFAULT_FONT,
+        "'Helvetica Neue', Helvetica, Arial, sans-serif",
+        "Georgia, 'Times New Roman', serif",
+        "Arial, Helvetica, sans-serif",
+        "Verdana, Geneva, sans-serif",
+        "'Courier New', Courier, monospace"
+    };
+
     private final Preferences prefs;
     private final MarkdownRenderer mdRenderer;
     private final JEditorPane editorPane;
@@ -91,10 +104,67 @@ public class MainWindow extends JFrame {
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
         // ------------------------------------------------------------------ //
+        // Toolbar — font selector
+        // ------------------------------------------------------------------ //
+        JComboBox<String> fontCombo = new JComboBox<>(FONT_NAMES);
+        fontCombo.setMaximumSize(new Dimension(180, 26));
+        fontCombo.setFocusable(false);
+
+        // Restore saved font preference
+        String savedFont = prefs.get(App.PREF_FONT, FONT_NAMES[0]);
+        for (int i = 0; i < FONT_NAMES.length; i++) {
+            if (FONT_NAMES[i].equals(savedFont)) {
+                fontCombo.setSelectedIndex(i);
+                mdRenderer.setFontFamily(FONT_STACKS[i]);
+                break;
+            }
+        }
+
+        fontCombo.addActionListener(e -> {
+            int idx = fontCombo.getSelectedIndex();
+            mdRenderer.setFontFamily(FONT_STACKS[idx]);
+            prefs.put(App.PREF_FONT, FONT_NAMES[idx]);
+            if (currentFile != null) openFile(currentFile);
+        });
+
+        // Font size selector
+        Integer[] sizes = {10, 11, 12, 13, 14};
+        JComboBox<Integer> sizeCombo = new JComboBox<>(sizes);
+        sizeCombo.setMaximumSize(new Dimension(60, 26));
+        sizeCombo.setFocusable(false);
+
+        int savedSize = prefs.getInt(App.PREF_FONT_SIZE, 12);
+        sizeCombo.setSelectedItem(savedSize);
+        mdRenderer.setFontSize(savedSize);
+
+        sizeCombo.addActionListener(e -> {
+            int sz = (Integer) sizeCombo.getSelectedItem();
+            mdRenderer.setFontSize(sz);
+            prefs.putInt(App.PREF_FONT_SIZE, sz);
+            if (currentFile != null) openFile(currentFile);
+        });
+
+        JPanel toolbar = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 4));
+        toolbar.setBackground(App.colors.awtBg());
+        toolbar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0,
+                App.colors.awtMuted()));
+        JLabel fontLabel = new JLabel("Font:");
+        fontLabel.setForeground(App.colors.awtMuted());
+        fontLabel.setFont(fontLabel.getFont().deriveFont(11f));
+        JLabel sizeLabel = new JLabel("Size:");
+        sizeLabel.setForeground(App.colors.awtMuted());
+        sizeLabel.setFont(sizeLabel.getFont().deriveFont(11f));
+        toolbar.add(fontLabel);
+        toolbar.add(fontCombo);
+        toolbar.add(sizeLabel);
+        toolbar.add(sizeCombo);
+
+        // ------------------------------------------------------------------ //
         // Root panel — gives us a coloured background behind the scroll pane
         // ------------------------------------------------------------------ //
         JPanel root = new JPanel(new BorderLayout());
         root.setBackground(App.colors.awtBg());
+        root.add(toolbar, BorderLayout.NORTH);
         root.add(scrollPane, BorderLayout.CENTER);
         setContentPane(root);
 

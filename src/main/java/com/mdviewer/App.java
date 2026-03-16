@@ -20,6 +20,8 @@ public class App {
     static final String PREF_Y      = "window.y";
     static final String PREF_WIDTH  = "window.width";
     static final String PREF_HEIGHT = "window.height";
+    static final String PREF_FONT      = "body.font";
+    static final String PREF_FONT_SIZE = "body.font.size";
 
     /** Active colour scheme — loaded once at startup, readable app-wide. */
     static ColorScheme colors;
