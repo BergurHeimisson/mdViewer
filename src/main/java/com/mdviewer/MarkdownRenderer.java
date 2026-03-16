@@ -20,8 +20,13 @@ import java.util.List;
  */
 public class MarkdownRenderer {
 
+    public static final String DEFAULT_FONT =
+            "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
+
     private final Parser parser;
     private final HtmlRenderer renderer;
+    private String fontFamily = DEFAULT_FONT;
+    private int fontSize = 12;
 
     public MarkdownRenderer() {
         List<org.commonmark.Extension> extensions = Arrays.asList(
@@ -37,6 +42,14 @@ public class MarkdownRenderer {
         renderer = HtmlRenderer.builder()
                 .extensions(extensions)
                 .build();
+    }
+
+    public void setFontFamily(String fontFamily) {
+        this.fontFamily = fontFamily;
+    }
+
+    public void setFontSize(int fontSize) {
+        this.fontSize = fontSize;
     }
 
     /**
@@ -94,20 +107,19 @@ public class MarkdownRenderer {
         return "body {\n"
              + "  background-color: " + bg + ";\n"
              + "  color: " + fg + ";\n"
-             + "  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', "
-             +           "Helvetica, Arial, sans-serif;\n"
-             + "  font-size: 13px;\n"
-             + "  line-height: 1.7;\n"
-             + "  margin: 32px 48px;\n"
+             + "  font-family: " + fontFamily + ";\n"
+             + "  font-size: " + fontSize + "px;\n"
+             + "  line-height: 2;\n"
+             + "  margin: 28px 40px;\n"
              + "  max-width: 860px;\n"
              + "}\n"
 
              // Headings
              + "h1, h2, h3, h4, h5, h6 {\n"
-             + "  color: " + heading + ";\n"
+             + "  color: " + fg + ";\n"
              + "  font-weight: 600;\n"
-             + "  margin-top: 0.4em;\n"
-             + "  margin-bottom: 0.4em;\n"
+             + "  margin-top: 1em;\n"
+             + "  margin-bottom: 1em;\n"
              + "}\n"
              + "h1 { font-size: 2em; color: " + fg + "; border-bottom: 2px solid " + surface + "; padding-bottom: 0.25em; }\n"
              + "h2 { font-size: 1.5em; border-bottom: 1px solid " + surface + "; padding-bottom: 0.2em; }\n"
@@ -121,7 +133,7 @@ public class MarkdownRenderer {
              + "code {\n"
              + "  background-color: " + surface + ";\n"
              + "  color: " + code + ";\n"
-             + "  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;\n"
+             + "  font-family: 'Menlo', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;\n"
              + "  font-size: 0.875em;\n"
              + "  padding: 2px 5px;\n"
              + "  border-radius: 4px;\n"
@@ -131,7 +143,7 @@ public class MarkdownRenderer {
              + "pre {\n"
              + "  background-color: " + surface + ";\n"
              + "  color: " + code + ";\n"
-             + "  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;\n"
+             + "  font-family: 'Menlo', 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;\n"
              + "  font-size: 0.875em;\n"
              + "  padding: 16px 20px;\n"
              + "  border-radius: 6px;\n"
